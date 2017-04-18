@@ -1,0 +1,16 @@
+#version 400
+
+layout(location = 0) in vec3 position;
+layout(location = 1) in vec4 colorIn;
+layout(location = 2) in vec3 normal;
+
+uniform mat4 camera;
+uniform mat4 projection;
+
+out vec4 colorOut;
+
+void main()
+{
+    gl_Position = projection * camera * vec4(position, 1.0);
+    colorOut = vec4((normal.x + 1)/2, (normal.y + 1)/2, (normal.z + 1)/2, 1.0);
+}

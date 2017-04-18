@@ -1,0 +1,15 @@
+#version 400
+
+layout(location = 0) in vec2 position;
+layout(location = 1) in vec2 texcoord;
+
+uniform mat4 camera;
+uniform mat4 projection;
+
+out vec2 texOut;
+
+void main()
+{
+    gl_Position = projection * camera * vec4(position, -1.0, 1.0);
+    texOut = texcoord;
+}

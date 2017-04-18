@@ -1,0 +1,13 @@
+#version 400
+
+in  vec4 colorOut;
+in vec2 texOut;
+
+uniform sampler2D texture_color;
+
+out vec4 fragColor;
+
+void main()
+{
+    fragColor = texture(texture_color, texOut);
+}

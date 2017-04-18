@@ -1,0 +1,12 @@
+#version 400
+
+in vec2 position;
+in vec2 texCoord;
+
+out vec4 colorOut;
+
+void main()
+{
+    gl_Position = vec4((position.x + gl_InstanceID % 10) / 10, (position.y + gl_InstanceID % 10) / 10, 0.0, 1.0);
+    colorOut = vec4(1.0, 1.0, 0.6, 1.0);
+}
