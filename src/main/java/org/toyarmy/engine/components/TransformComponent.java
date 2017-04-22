@@ -11,6 +11,21 @@ public class TransformComponent extends Component {
 
     private Vector2f position = new Vector2f(0,0);
     private float rotation = 0;
+    private float scale = 1;
+
+    public float getDepth() {
+        return depth;
+    }
+
+    private  float depth = 0;
+
+    public float getScale() {
+        return scale;
+    }
+
+    public void setScale(float scale) {
+        this.scale = scale;
+    }
 
     public Vector2f getPosition() {
         return position;
@@ -20,8 +35,9 @@ public class TransformComponent extends Component {
         return rotation;
     }
 
-    public TransformComponent(Entity parentEntity) {
+    public TransformComponent(Entity parentEntity, float depth) {
         super(parentEntity);
+        this.depth = depth;
     }
 
     public void translate(Vector2f vector2f){

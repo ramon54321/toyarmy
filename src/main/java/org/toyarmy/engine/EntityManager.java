@@ -1,7 +1,11 @@
 package org.toyarmy.engine;
 
-import java.util.HashSet;
+import org.toyarmy.engine.components.TransformComponent;
+
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Created by Ramon Brand on 4/15/2017.
@@ -10,7 +14,7 @@ import java.util.Set;
  */
 public class EntityManager {
 
-    private Set<Entity> entities = new HashSet<Entity>();
+    private Set<Entity> entities = new TreeSet<Entity>(new EntityDepthComparator());
 
     private EntityManager(){}
     public static EntityManager instance = null;
@@ -30,8 +34,8 @@ public class EntityManager {
         this.entities.add(entity);
     }
 
-    public Entity createNewEntity(){
-        Entity entity = new Entity();
+    public Entity createNewEntity(float depth){
+        Entity entity = new Entity(depth);
         EntityManager.getInstance().addEntity(entity);
         return entity;
     }

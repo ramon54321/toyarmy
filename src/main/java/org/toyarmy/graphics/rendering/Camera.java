@@ -4,6 +4,7 @@ import org.joml.Math;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.toyarmy.Main;
 
 public class Camera {
 	
@@ -11,20 +12,20 @@ public class Camera {
 	
 	private Matrix4f projectionMatrix = new Matrix4f();
 
-    private float aspectRatio = 1280f/720f;
-    private float zoom = 10f;
+    private float aspectRatio;
+    private float zoom = 16f;
 
 	public Camera(){
-        this.projectionMatrix = new Matrix4f().ortho2D(-aspectRatio * zoom, aspectRatio * zoom, -1 * zoom, 1 * zoom);
-		
+		this.aspectRatio = Main.instance.getDisplay().getWIDTH() / Main.instance.getDisplay().getHEIGHT();
+		this.projectionMatrix = new Matrix4f().ortho(-aspectRatio * zoom, aspectRatio * zoom, -1 * zoom, 1 * zoom, 0, 100);
 		this.position.x = 0;
 		this.position.y = 0;
-		this.position.z = 2;
+		this.position.z = 0;
 	}
 
     public Vector2f screenToWorld(Vector2f screenPosition){
-        float x = (screenPosition.x - (1280/2)) / 1280 * zoom*2*aspectRatio + position.x;
-        float y = ((720 - screenPosition.y) - (720/2)) / 720 * zoom*2 + position.y;
+        float x = (screenPosition.x - (Main.instance.getDisplay().getWIDTH()/2)) / Main.instance.getDisplay().getWIDTH() * zoom*2*aspectRatio + position.x;
+        float y = ((Main.instance.getDisplay().getHEIGHT() - screenPosition.y) - (Main.instance.getDisplay().getHEIGHT()/2)) / Main.instance.getDisplay().getHEIGHT() * zoom*2 + position.y;
         return new Vector2f(x, y);
     }
 	

@@ -1,5 +1,7 @@
 package org.toyarmy.engine;
 
+import org.toyarmy.engine.components.TransformComponent;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,6 +42,21 @@ public class Entity {
 
     public void addComponent(Component component){
         components.add(component);
+    }
+
+    public void deleteComponent(Component component){
+        components.remove(component);
+        component.delete();
+    }
+
+    public Entity(float depth) {
+        addComponent(new TransformComponent(this, depth));
+    }
+
+    public void delete() {
+        for (Component component : components) {
+            deleteComponent(component);
+        }
     }
 
 }

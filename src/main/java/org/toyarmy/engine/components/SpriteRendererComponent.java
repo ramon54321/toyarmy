@@ -27,8 +27,6 @@ public class SpriteRendererComponent extends Component {
     public SpriteRendererComponent(Entity parentEntity, Texture texture) {
         super(parentEntity);
         this.texture = texture;
-        if(!parentEntity.hasComponent(TransformComponent.class))
-            parentEntity.addComponent(new TransformComponent(parentEntity));
 
         this.transformComponent = (TransformComponent) parentEntity.getComponent(TransformComponent.class);
     }
@@ -51,8 +49,9 @@ public class SpriteRendererComponent extends Component {
         Vector3f cameraPosition = Main.instance.getCamera().getPosition();
         Vector2f entityPosition = transformComponent.getPosition();
         float entityRotation = transformComponent.getRotation();
+        float entityScale = transformComponent.getScale();
         float[] cameraBuffer = new float[16];
-        Main.instance.getCamera().getViewMatrix().translate(entityPosition.x, entityPosition.y, 0).translate(-cameraPosition.x, -cameraPosition.y, 0).rotateZ(entityRotation / -(180f / (float)Math.PI)).get(cameraBuffer);
+        Main.instance.getCamera().getViewMatrix().translate(entityPosition.x, entityPosition.y, 0).translate(-cameraPosition.x, -cameraPosition.y, -cameraPosition.z).rotateZ(entityRotation / -(180f / (float)Math.PI)).scale(entityScale).get(cameraBuffer);
         shaderProgram.setUniform("camera", cameraBuffer);
 
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

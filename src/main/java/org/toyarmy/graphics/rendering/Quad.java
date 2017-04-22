@@ -52,19 +52,19 @@ public class Quad {
 
 	private void start(){
 		glBindVertexArray(vaoId);
-		
+
 		// Setup positions vbo
 		FloatBuffer positionsBuffer = BufferLoader.getFloatBuffer(positionsData);
 		glBindBuffer(GL_ARRAY_BUFFER, vboPositionsId);
 		glBufferData(GL_ARRAY_BUFFER, positionsBuffer, GL_STATIC_DRAW);
 		glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, 0);
-		
+
 		// Setup uvs vbo
 		FloatBuffer uvsBuffer = BufferLoader.getFloatBuffer(uvsData);
 		glBindBuffer(GL_ARRAY_BUFFER, vboUvsId);
 		glBufferData(GL_ARRAY_BUFFER, uvsBuffer, GL_STATIC_DRAW);
 		glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
-		
+
 		// Index vbo
 		IntBuffer indexBuffer = BufferLoader.getIntBuffer(indexData);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIndexId);

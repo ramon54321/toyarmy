@@ -25,7 +25,11 @@ public class MouseFollowerBehaviour extends Behaviour {
 
     @Override
     public void updateComponent(float deltaTime) {
-        translateVector = getMouseWorldPosition().sub(transformComponent.getPosition()).normalize();
+        translateVector = getMouseWorldPosition().sub(transformComponent.getPosition());
+
+        if(translateVector.lengthSquared() > 1)
+            translateVector.normalize();
+
         transformComponent.translate(translateVector.mul(deltaTime * 6));
     }
 

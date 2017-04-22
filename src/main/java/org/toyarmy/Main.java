@@ -16,11 +16,11 @@ public class Main {
 
     public static Main instance;
 
-    private Display display = new Display(1280,720,"Toy Army!");
-    private Camera camera = new Camera();
+    private Display display;
+    private Camera camera;
 
-    private EntityManager entityManager = EntityManager.getInstance();
-    private RenderManager renderManager = RenderManager.getInstance(display, camera, entityManager);
+    private EntityManager entityManager;
+    private RenderManager renderManager;
 
     public Display getDisplay() {
         return display;
@@ -32,6 +32,12 @@ public class Main {
 
     public void run() {
         instance = this;
+
+        display = new Display(1024,1024,"Toy Army!");
+        camera = new Camera();
+
+        entityManager = EntityManager.getInstance();
+        renderManager = RenderManager.getInstance(display, camera, entityManager);
 
         System.out.println("Hello LWJGL " + Version.getVersion() + "!");
 
@@ -48,7 +54,7 @@ public class Main {
 
     private void init() {
 
-        Entity entity = entityManager.createNewEntity();
+        Entity entity = entityManager.createNewEntity(0);
         entity.addComponent(new GameManager(entity));
 
     }
