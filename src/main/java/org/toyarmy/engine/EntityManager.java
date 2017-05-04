@@ -2,10 +2,7 @@ package org.toyarmy.engine;
 
 import org.toyarmy.engine.components.TransformComponent;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * Created by Ramon Brand on 4/15/2017.
@@ -14,9 +11,17 @@ import java.util.TreeSet;
  */
 public class EntityManager {
 
-    private Set<Entity> entities = new TreeSet<Entity>(new EntityDepthComparator());
+    private static final int maxEntites = 2048;
 
-    private EntityManager(){}
+    private Set<Entity> entities = new TreeSet<Entity>(new EntityDepthComparator());
+    private Entity[] entitiesArray = new Entity[maxEntites];
+    private Stack<Integer> freeEntities = new Stack<>();
+
+    private EntityManager(){
+        for(int i = maxEntites-1; i >= 0; i--) {
+            freeEntities.push(i);
+        }
+    }
     public static EntityManager instance = null;
     public static EntityManager getInstance(){
         if(instance == null)
@@ -35,9 +40,15 @@ public class EntityManager {
     }
 
     public Entity createNewEntity(float depth){
-        Entity entity = new Entity(depth);
+        int newEntityId = freeEntities.pop();
+        Entity entity = new Entity(newEntityId, depth);
         EntityManager.getInstance().addEntity(entity);
+        entitiesArray[newEntityId] = entity;
         return entity;
+    }
+
+    public Entity getEntityById(int id) {
+        return entitiesArray[id];
     }
 
     public Set<Entity> getEntities(){

@@ -35,4 +35,89 @@ public class LineSegment {
 
         return false;
     }
+
+    public static Vector2f findIntersectionOf(LineSegment lineSegment1, LineSegment lineSegment2) {
+
+        // Get points in memory
+        float l1p1x = lineSegment1.point1.x;
+        float l1p1y = lineSegment1.point1.y;
+        float l1p2x = lineSegment1.point2.x;
+        float l1p2y = lineSegment1.point2.y;
+        float l2p1x = lineSegment2.point1.x;
+        float l2p1y = lineSegment2.point1.y;
+        float l2p2x = lineSegment2.point2.x;
+        float l2p2y = lineSegment2.point2.y;
+
+        float xPoint;
+        float yPoint;
+
+        if(l1p1x == l1p2x) {
+            xPoint = l1p1x;
+
+            // Get slope
+            float l2slope = (l2p2y - l2p1y) / (l2p2x - l2p1x);
+
+            // Solve y-intercept
+            float l2yintercept = (l2slope * l2p1x - l2p1y) * -1f;
+
+            // Point of intersection
+            yPoint = l2slope * xPoint + l2yintercept;
+        } else if (l2p1x == l2p2x) {
+            xPoint = l2p1x;
+
+            // Get slope
+            float l1slope = (l1p2y - l1p1y) / (l1p2x - l1p1x);
+
+            // Solve y-intercept
+            float l1yintercept = (l1slope * l1p1x - l1p1y) * -1f;
+
+            // Point of intersection
+            yPoint = l1slope * xPoint + l1yintercept;
+        } else {
+
+            // Get slope
+            float l1slope = (l1p2y - l1p1y) / (l1p2x - l1p1x);
+            float l2slope = (l2p2y - l2p1y) / (l2p2x - l2p1x);
+
+            // Solve y-intercept
+            float l1yintercept = (l1slope * l1p1x - l1p1y) * -1f;
+            float l2yintercept = (l2slope * l2p1x - l2p1y) * -1f;
+
+            // Point of intersection
+            xPoint = (l2yintercept - l1yintercept) / (l1slope - l2slope);
+            yPoint = l1slope * xPoint + l1yintercept;
+        }
+
+        // Check if point is in segment1
+        if(xPoint > Math.max(l1p1x, l1p2x))
+            return null;
+
+        if(xPoint < Math.min(l1p1x, l1p2x))
+            return null;
+
+        // Check if point is in segment2
+        if(xPoint > Math.max(l2p1x, l2p2x))
+            return null;
+
+        if(xPoint < Math.min(l2p1x, l2p2x))
+            return null;
+
+        // Check if point is in segment1
+        if(yPoint > Math.max(l1p1y, l1p2y))
+            return null;
+
+        if(yPoint < Math.min(l1p1y, l1p2y))
+            return null;
+
+        // Check if point is in segment2
+        if(yPoint > Math.max(l2p1y, l2p2y))
+            return null;
+
+        if(yPoint < Math.min(l2p1y, l2p2y))
+            return null;
+
+        //System.out.println("INT: " + xPoint + " , " + yPoint);
+
+        return new Vector2f(xPoint, yPoint);
+    }
 }

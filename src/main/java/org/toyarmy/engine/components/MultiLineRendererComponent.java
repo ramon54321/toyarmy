@@ -8,6 +8,7 @@ import org.toyarmy.engine.Component;
 import org.toyarmy.engine.Entity;
 import org.toyarmy.engine.math.LineSegment;
 import org.toyarmy.game.behaviours.CollisionBehaviour;
+import org.toyarmy.game.utility.CollisionSegment;
 import org.toyarmy.graphics.rendering.shaders.ShaderProgram;
 import org.toyarmy.graphics.rendering.utilities.BufferLoader;
 
@@ -52,8 +53,8 @@ public class MultiLineRendererComponent extends Component {
             if(collisionBehaviour == null)
                 return;
 
-            for(LineSegment lineSegment : collisionBehaviour.collisionSegments) {
-                lineSegments.add(lineSegment);
+            for(CollisionSegment collisionSegment : collisionBehaviour.getCollisionSegments()) {
+                lineSegments.add(collisionSegment.getCollisionLineSegment());
             }
 
             setColor(1.0f, 0.0f, 0.0f);

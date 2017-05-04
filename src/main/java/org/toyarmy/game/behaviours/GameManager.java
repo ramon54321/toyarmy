@@ -12,6 +12,8 @@ import org.toyarmy.engine.components.MultiLineRendererComponent;
 import org.toyarmy.engine.components.SpriteRendererComponent;
 import org.toyarmy.engine.components.TransformComponent;
 import org.toyarmy.engine.math.LineSegment;
+import org.toyarmy.game.utility.CollisionMaterial;
+import org.toyarmy.game.utility.CollisionSegment;
 import org.toyarmy.graphics.rendering.Camera;
 import org.toyarmy.graphics.rendering.Texture;
 
@@ -32,6 +34,8 @@ public class GameManager extends Behaviour {
 
     public static GameManager instance;
 
+    public static final float RANGE_DIVISIOR = 10;
+
     // Camera
     private float camera_speed = 12f;
 
@@ -48,6 +52,7 @@ public class GameManager extends Behaviour {
     }
 
     Entity testEntity;
+    Entity testEntity2;
     Entity colEntity;
     LineRendererComponent mainLineRenderer;
 
@@ -61,26 +66,41 @@ public class GameManager extends Behaviour {
         parentEntity.addComponent(mainLineRenderer);
 
         buildEntitiesFromFile();
+
+        Vector2f mousePosition = MouseFollowerBehaviour.getMouseWorldPosition();
+
+        GameManager.instance.mainLineRenderer.setPoint1(0, 0);
+        Vector2f targetPos = ((TransformComponent)testEntity2.getComponent(TransformComponent.class)).getPosition();
+        GameManager.instance.mainLineRenderer.setPoint2(targetPos.x, targetPos.y);
+
+        ((SoldierBehaviour)testEntity.getComponent(SoldierBehaviour.class)).shootTarget((SoldierBehaviour) testEntity2.getComponent(SoldierBehaviour.class));
     }
 
     private void buildEntitiesFromFile(){
         // TODO: Read from file!
 
+
+
         // Soldier
         testEntity = EntityManager.getInstance().createNewEntity(-1);
         testEntity.addComponent(new SpriteRendererComponent(testEntity, new Texture("unit.png")));
-        testEntity.addComponent(new MouseFollowerBehaviour(testEntity));
+        //testEntity.addComponent(new MouseFollowerBehaviour(testEntity));
         testEntity.addComponent(new SoldierBehaviour(testEntity));
+
+        testEntity2 = EntityManager.getInstance().createNewEntity(-1);
+        testEntity2.addComponent(new SpriteRendererComponent(testEntity2, new Texture("unit.png")));
+        //testEntity2.addComponent(new MouseFollowerBehaviour(testEntity2));
+        testEntity2.addComponent(new SoldierBehaviour(testEntity2));
+        ((TransformComponent)testEntity2.getComponent(TransformComponent.class)).translate(new Vector2f(2, 7));
 
         // Collider
         colEntity = EntityManager.getInstance().createNewEntity(-2);
         colEntity.addComponent(new SpriteRendererComponent(colEntity, new Texture("house1.png")));
         colEntity.addComponent(new CollisionBehaviour(colEntity));
-        ((CollisionBehaviour)colEntity.getComponent(CollisionBehaviour.class)).collisionSegments.add(new LineSegment(new Vector2f(-0.5f, 0.5f), new Vector2f(0, 0.5f)));
-        ((CollisionBehaviour)colEntity.getComponent(CollisionBehaviour.class)).collisionSegments.add(new LineSegment(new Vector2f(-0.5f, 0.5f), new Vector2f(-0.5f, -0.2f)));
-        ((CollisionBehaviour)colEntity.getComponent(CollisionBehaviour.class)).collisionSegments.add(new LineSegment(new Vector2f(0, -0.5f), new Vector2f(0.5f, -0.5f)));
+        ((CollisionBehaviour)colEntity.getComponent(CollisionBehaviour.class)).getCollisionSegments().add(new CollisionSegment(new LineSegment(new Vector2f(-2.0f, 5.0f), new Vector2f(2, 5.0f)), new CollisionMaterial()));
+        ((CollisionBehaviour)colEntity.getComponent(CollisionBehaviour.class)).getCollisionSegments().add(new CollisionSegment(new LineSegment(new Vector2f(-2.0f, 15.0f), new Vector2f(2, 15.0f)), new CollisionMaterial()));
         ((TransformComponent)colEntity.getComponent(TransformComponent.class)).rotate(0f);
-        ((TransformComponent)colEntity.getComponent(TransformComponent.class)).setScale(8f);
+        ((TransformComponent)colEntity.getComponent(TransformComponent.class)).setScale(1f);
         colEntity.addComponent(new MultiLineRendererComponent(colEntity, MultiLineRendererComponent.SOURCE_COLLISION));
 
     }
@@ -93,7 +113,7 @@ public class GameManager extends Behaviour {
     @Override
     public void updateComponent(float deltaTime) {
 
-        ((SoldierBehaviour)testEntity.getComponent(SoldierBehaviour.class)).hasLineOfSightTo(new Vector2f(4f, 4f));
+
 
         updateCamera(deltaTime);
 

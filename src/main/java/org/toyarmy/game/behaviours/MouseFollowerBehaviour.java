@@ -14,7 +14,7 @@ import static org.lwjgl.glfw.GLFW.glfwGetCursorPos;
  */
 public class MouseFollowerBehaviour extends Behaviour {
 
-    private long windowId = Main.instance.getDisplay().getWindowId();
+    private static long windowId = Main.instance.getDisplay().getWindowId();
     private TransformComponent transformComponent;
     private Vector2f translateVector;
 
@@ -33,7 +33,7 @@ public class MouseFollowerBehaviour extends Behaviour {
         transformComponent.translate(translateVector.mul(deltaTime * 6));
     }
 
-    private Vector2f getMouseWorldPosition(){
+    public static Vector2f getMouseWorldPosition(){
         double[] curX = new double[1];
         double[] curY = new double[1];
         glfwGetCursorPos(windowId, curX, curY);

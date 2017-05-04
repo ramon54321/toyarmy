@@ -10,6 +10,8 @@ import java.util.List;
  */
 public class Entity {
 
+    public final int id;
+
     protected List<Component> components = new ArrayList<>();
 
     public void renderComponents(){
@@ -49,7 +51,8 @@ public class Entity {
         component.delete();
     }
 
-    public Entity(float depth) {
+    public Entity(int id, float depth) {
+        this.id = id;
         addComponent(new TransformComponent(this, depth));
     }
 
