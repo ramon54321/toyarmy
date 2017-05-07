@@ -18,9 +18,10 @@ public class Weapon extends Item {
     public static Map<String, Weapon> weaponMap = new HashMap<>();
 
     static {
-        weaponMap.put("M16A4", new Weapon(3.26f, 700f, 1.0f, null, new HashSet<>(Arrays.asList("Stanag30", "Stanag20"))));
+        weaponMap.put("M16A4", new Weapon("M16A4", 3.26f, 700f, 1.0f, null, new HashSet<>(Arrays.asList("Stanag30", "Stanag20"))));
     }
 
+    private String type;
     private float unloadedWeight;
     private float rateOfFire;
     private float barrelVelocityBoost;
@@ -45,15 +46,21 @@ public class Weapon extends Item {
         if(template == null)
             return null;
 
-        return new Weapon(template.unloadedWeight, template.rateOfFire, template.barrelVelocityBoost, template.magazine, template.acceptedMagazines);
+        return new Weapon(template.type, template.unloadedWeight, template.rateOfFire, template.barrelVelocityBoost, template.magazine, template.acceptedMagazines);
     }
 
-    private Weapon(float unloadedWeight, float rateOfFire, float barrelVelocityBoost, Magazine magazine, HashSet<String> acceptedMagazines) {
+    private Weapon(String type, float unloadedWeight, float rateOfFire, float barrelVelocityBoost, Magazine magazine, HashSet<String> acceptedMagazines) {
+        this.type = type;
         this.unloadedWeight = unloadedWeight;
         this.rateOfFire = rateOfFire;
         this.barrelVelocityBoost = barrelVelocityBoost;
         this.magazine = magazine;
         this.acceptedMagazines = acceptedMagazines;
+    }
+
+    @Override
+    public String toString() {
+        return this.type + " - Unloaded Weight: " + this.unloadedWeight + " - Rate of Fire: " + this.rateOfFire + " - Barrel Velocity Boost: " + this.barrelVelocityBoost;
     }
 
     public float getUnloadedWeight() {

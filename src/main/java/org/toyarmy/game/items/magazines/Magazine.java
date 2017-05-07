@@ -71,4 +71,9 @@ public class Magazine extends Item {
 
         return true;
     }
+
+    @Override
+    public String toString() {
+        return this.type + " - " + this.currentCount + "/" + this.maxCount;
+    }
 }

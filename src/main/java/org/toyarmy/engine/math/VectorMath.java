@@ -26,4 +26,53 @@ public class VectorMath {
         return (val > 0) ? 1 : 2;
     }
 
+    public static float getAngleBetween(Vector2f vector1, Vector2f vector2) {
+        return (float) (Math.acos((vector1.dot(vector2))/(vector1.length() * vector2.length())) * (180 / Math.PI));
+    }
+
+    public static float getBearingFrom(Vector2f from, Vector2f to) {
+        return getBearingOf(new Vector2f(to).sub(from));
+    }
+
+    public static float getBearingOf(Vector2f vector) {
+
+        float raw = (float) (Math.atan2(vector.y, vector.x) * (180 / Math.PI));
+
+        if(raw == 180)
+            return 270;
+
+        if((raw > 0 && raw <= 90) || (raw <= 0 && raw >= -90))
+            return 90 - raw;
+
+        if(raw > 90)
+            return 180 + raw;
+
+        if(raw < -90)
+            return 360 + raw;
+
+        return -1;
+    }
+
+    public static float lerp(float point1, float point2, float alpha) {
+        return point1 + alpha * (point2 - point1);
+    }
+
+    public static float invertedLerp(float point1, float point2, float current) {
+        return (current - point1) / (point2 - point1);
+    }
+
+    public static float linearToCubic(float alpha) {
+        return alpha * alpha * (3.0f - 2.0f * alpha);
+    }
+
+    public static float getBearingDifference(float startBearing, float targetBearing) {
+        float differenceRaw = targetBearing - startBearing;
+
+        if(differenceRaw > 180) {// Left -> Neg
+            return (360 - differenceRaw) * -1;
+        } else {//Right
+            return differenceRaw;
+        }
+    }
+
 }

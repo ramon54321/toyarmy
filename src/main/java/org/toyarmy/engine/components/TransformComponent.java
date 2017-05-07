@@ -46,6 +46,16 @@ public class TransformComponent extends Component {
 
     public void rotate(float rotate){
         rotation += rotate;
+
+        if(rotation >= 360) {
+            rotation -= 360;
+            return;
+        }
+
+        if(rotation < 0) {
+            rotation += 360;
+            return;
+        }
     }
 
     @Override

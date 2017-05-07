@@ -1,18 +1,24 @@
 package org.toyarmy;
 
+import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 import org.lwjgl.Version;
+import org.toyarmy.debug.Controller;
 import org.toyarmy.engine.Entity;
 import org.toyarmy.engine.EntityManager;
 import org.toyarmy.game.behaviours.GameManager;
 import org.toyarmy.graphics.Display;
 import org.toyarmy.graphics.rendering.Camera;
 import org.toyarmy.graphics.rendering.RenderManager;
-import org.toyarmy.graphics.rendering.Texture;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 
-public class Main {
+public class Main extends Application{
 
     public static Main instance;
 
@@ -30,6 +36,16 @@ public class Main {
         return camera;
     }
 
+    public static boolean isRunning = true;
+
+    @Override
+    public void start(Stage primaryStage) throws Exception{
+        Parent root = FXMLLoader.load(getClass().getResource("debug.fxml"));
+        primaryStage.setTitle("Toy Army Debugger");
+        primaryStage.setScene(new Scene(root, 1200, 600));
+        primaryStage.show();
+    }
+
     public void run() {
         instance = this;
 
@@ -41,7 +57,7 @@ public class Main {
 
         System.out.println("Hello LWJGL " + Version.getVersion() + "!");
 
-        init();
+        initGame();
         gameLoop();
 
         // Free the window callbacks and destroy the window
@@ -52,7 +68,7 @@ public class Main {
         glfwTerminate();
     }
 
-    private void init() {
+    private void initGame() {
 
         Entity entity = entityManager.createNewEntity(0);
         entity.addComponent(new GameManager(entity));
@@ -69,7 +85,7 @@ public class Main {
         int updates = 0;
         int frames = 0;
 
-        while(!glfwWindowShouldClose(display.getWindowId())){
+        while(!glfwWindowShouldClose(display.getWindowId()) && isRunning){
             long now = System.nanoTime();
             delta += (now - lastTime) / ns;
             lastTime = now;
@@ -84,7 +100,8 @@ public class Main {
             frames++;
             if (System.currentTimeMillis() - timer > 1000) {
                 timer += 1000;
-                System.out.println(updates + " ups, " + frames + " fps");
+                //System.out.println(updates + " ups, " + frames + " fps");
+                Controller.setFps(updates + " ups, " + frames + " fps");
                 updates = 0;
                 frames = 0;
             }
@@ -104,7 +121,13 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        new Main().run();
+        new Thread(){
+            @Override
+            public void run() {
+                new Main().run();
+            }
+        }.start();
+        launch(args);
     }
 
 }

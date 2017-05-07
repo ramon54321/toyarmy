@@ -1,6 +1,7 @@
 package org.toyarmy.game.behaviours;
 
 import org.joml.Vector2f;
+import org.toyarmy.debug.Controller;
 import org.toyarmy.engine.Entity;
 import org.toyarmy.engine.components.TransformComponent;
 import org.toyarmy.engine.math.IntersectData;
@@ -12,6 +13,8 @@ import org.toyarmy.game.items.armour.BodyArmour;
 import org.toyarmy.game.items.magazines.Magazine;
 import org.toyarmy.game.items.weapons.Weapon;
 import org.toyarmy.game.systems.health.HealthSystem;
+import org.toyarmy.game.systems.movement.MovementSystem;
+import org.toyarmy.game.systems.optics.OpticsSystem;
 import org.toyarmy.game.utility.BallisticData;
 import org.toyarmy.game.utility.CollisionSegment;
 
@@ -28,8 +31,9 @@ public class SoldierBehaviour extends Behaviour {
 
     private TransformComponent transformComponent;
 
+    private OpticsSystem opticsSystem;
+    private MovementSystem movementSystem;
     private HealthSystem healthSystem;
-    private BodyArmour bodyArmour;
     private Weapon weaponPrimary;
 
     private int selectedWeapon = 0;
@@ -38,18 +42,21 @@ public class SoldierBehaviour extends Behaviour {
     public void start() {
         super.start();
 
-        // Arm
-        Magazine mag = Magazine.getNewMagazine("Stanag30");
+        this.transformComponent = (TransformComponent) parentEntity.getComponent(TransformComponent.class);
 
+        // Setup Soldier
+        opticsSystem = new OpticsSystem(5, 45);
+        movementSystem = new MovementSystem(transformComponent);
+        healthSystem = new HealthSystem();
+        Magazine mag = Magazine.getNewMagazine("Stanag30");
         weaponPrimary = Weapon.getNewWeapon("M16A4");
         weaponPrimary.setMagazine(mag);
-
-        bodyArmour = BodyArmour.getNewBodyArmour("LightweightCarrier");
     }
 
     @Override
     public void updateComponent(float deltaTime) {
         super.updateComponent(deltaTime);
+        movementSystem.update(deltaTime);
         healthSystem.update(deltaTime);
     }
 
@@ -57,9 +64,7 @@ public class SoldierBehaviour extends Behaviour {
     public void takeHit(BallisticData ballisticData) {
         System.out.println("Taking hit: Velocity = " + ballisticData.velocity + " , Energy = " + ballisticData.energy + " , Ammunition Mass = " + ballisticData.ammunition.getBulletMass());
 
-        float finalEnergy = ballisticData.energy - bodyArmour.getArmour();
-
-
+        healthSystem.takeHit(ballisticData);
     }
 
     // Shooting
@@ -69,6 +74,7 @@ public class SoldierBehaviour extends Behaviour {
             return false;
 
         BallisticData ballisticData = getBulletBallisticsTo(soldierBehaviour.transformComponent.getPosition());
+        System.out.println("Magazine: " + weaponPrimary.getMagazine().getCurrentCount() + " / " + weaponPrimary.getMagazine().getMaxCount());
         soldierBehaviour.takeHit(ballisticData);
         return true;
     }
@@ -148,9 +154,28 @@ public class SoldierBehaviour extends Behaviour {
         return intersectDataSet;
     }
 
+    // Getters
+    public HealthSystem getHealthSystem() {
+        return healthSystem;
+    }
+
+    public MovementSystem getMovementSystem() {
+        return movementSystem;
+    }
+
+    public OpticsSystem getOpticsSystem() {
+        return opticsSystem;
+    }
+
+    public Weapon getWeaponPrimary() {
+        return weaponPrimary;
+    }
+
+    public TransformComponent getTransformComponent() {
+        return transformComponent;
+    }
+
     public SoldierBehaviour(Entity parentEntity) {
         super(parentEntity);
-
-        this.transformComponent = (TransformComponent) parentEntity.getComponent(TransformComponent.class);
     }
 }

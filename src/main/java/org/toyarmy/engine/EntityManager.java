@@ -54,4 +54,18 @@ public class EntityManager {
     public Set<Entity> getEntities(){
         return this.entities;
     }
+
+    public int getNextEntityId(int currentId) {
+        for (int i = currentId+1; i < entitiesArray.length; i++) {
+            if (entitiesArray[i] != null) {
+                return i;
+            }
+        }
+        for (int i = 0; i < currentId; i++) {
+            if (entitiesArray[i] != null) {
+                return i;
+            }
+        }
+        return -1;
+    }
 }

@@ -19,4 +19,16 @@ public class BallisticData {
         this.energy = energy;
         this.ammunition = ammunition;
     }
+
+    // Returns true if velocity is still above 0
+    public boolean dissipateBy(float energy) {
+        this.energy -= energy;
+        if(this.energy < 0) {
+            this.energy = 0;
+            this.velocity = 0;
+            return false;
+        }
+        this.velocity = (float) Math.sqrt(2 * this.energy / ammunition.getBulletMass());
+        return true;
+    }
 }

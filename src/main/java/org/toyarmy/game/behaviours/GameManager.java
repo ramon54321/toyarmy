@@ -5,13 +5,16 @@ import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.toyarmy.Main;
+import org.toyarmy.debug.Controller;
 import org.toyarmy.engine.Entity;
 import org.toyarmy.engine.EntityManager;
+import org.toyarmy.engine.MousePosition;
 import org.toyarmy.engine.components.LineRendererComponent;
 import org.toyarmy.engine.components.MultiLineRendererComponent;
 import org.toyarmy.engine.components.SpriteRendererComponent;
 import org.toyarmy.engine.components.TransformComponent;
 import org.toyarmy.engine.math.LineSegment;
+import org.toyarmy.game.ammunition.Ammunition;
 import org.toyarmy.game.utility.CollisionMaterial;
 import org.toyarmy.game.utility.CollisionSegment;
 import org.toyarmy.graphics.rendering.Camera;
@@ -39,6 +42,13 @@ public class GameManager extends Behaviour {
     // Camera
     private float camera_speed = 12f;
 
+    // Input
+    private boolean[] keyDown = new boolean[256];
+
+    // Selection
+    private int selectedEntityId = 0;
+    private Entity selectedEntity;
+
     // Component Lists
     public ArrayList<CollisionBehaviour> collisionEntitiesCollisionBehaviours;
 
@@ -54,7 +64,7 @@ public class GameManager extends Behaviour {
     Entity testEntity;
     Entity testEntity2;
     Entity colEntity;
-    LineRendererComponent mainLineRenderer;
+    //LineRendererComponent mainLineRenderer;
 
     @Override
     public void start() {
@@ -62,18 +72,16 @@ public class GameManager extends Behaviour {
         System.out.println("Game manager started.");
 
         // General Line Renderer
-        mainLineRenderer = new LineRendererComponent(parentEntity);
-        parentEntity.addComponent(mainLineRenderer);
+        //mainLineRenderer = new LineRendererComponent(parentEntity);
+        //parentEntity.addComponent(mainLineRenderer);
 
         buildEntitiesFromFile();
 
-        Vector2f mousePosition = MouseFollowerBehaviour.getMouseWorldPosition();
+        //GameManager.instance.mainLineRenderer.setPoint1(0, 0);
+        //Vector2f targetPos = ((TransformComponent)testEntity2.getComponent(TransformComponent.class)).getPosition();
+        //GameManager.instance.mainLineRenderer.setPoint2(targetPos.x, targetPos.y);
 
-        GameManager.instance.mainLineRenderer.setPoint1(0, 0);
-        Vector2f targetPos = ((TransformComponent)testEntity2.getComponent(TransformComponent.class)).getPosition();
-        GameManager.instance.mainLineRenderer.setPoint2(targetPos.x, targetPos.y);
-
-        ((SoldierBehaviour)testEntity.getComponent(SoldierBehaviour.class)).shootTarget((SoldierBehaviour) testEntity2.getComponent(SoldierBehaviour.class));
+        //((SoldierBehaviour)testEntity.getComponent(SoldierBehaviour.class)).shootTarget((SoldierBehaviour) testEntity2.getComponent(SoldierBehaviour.class));
     }
 
     private void buildEntitiesFromFile(){
@@ -84,8 +92,8 @@ public class GameManager extends Behaviour {
         // Soldier
         testEntity = EntityManager.getInstance().createNewEntity(-1);
         testEntity.addComponent(new SpriteRendererComponent(testEntity, new Texture("unit.png")));
-        //testEntity.addComponent(new MouseFollowerBehaviour(testEntity));
         testEntity.addComponent(new SoldierBehaviour(testEntity));
+        testEntity.addComponent(new MultiLineRendererComponent(testEntity, MultiLineRendererComponent.SOURCE_FIELDOFVIEW));
 
         testEntity2 = EntityManager.getInstance().createNewEntity(-1);
         testEntity2.addComponent(new SpriteRendererComponent(testEntity2, new Texture("unit.png")));
@@ -95,7 +103,7 @@ public class GameManager extends Behaviour {
 
         // Collider
         colEntity = EntityManager.getInstance().createNewEntity(-2);
-        colEntity.addComponent(new SpriteRendererComponent(colEntity, new Texture("house1.png")));
+        //colEntity.addComponent(new SpriteRendererComponent(colEntity, new Texture("house1.png")));
         colEntity.addComponent(new CollisionBehaviour(colEntity));
         ((CollisionBehaviour)colEntity.getComponent(CollisionBehaviour.class)).getCollisionSegments().add(new CollisionSegment(new LineSegment(new Vector2f(-2.0f, 5.0f), new Vector2f(2, 5.0f)), new CollisionMaterial()));
         ((CollisionBehaviour)colEntity.getComponent(CollisionBehaviour.class)).getCollisionSegments().add(new CollisionSegment(new LineSegment(new Vector2f(-2.0f, 15.0f), new Vector2f(2, 15.0f)), new CollisionMaterial()));
@@ -116,12 +124,57 @@ public class GameManager extends Behaviour {
 
 
         updateCamera(deltaTime);
+        updateDebug();
+    }
 
+    private void selectEntity(int entityId) {
+        selectedEntity = EntityManager.instance.getEntityById(entityId);
+    }
+
+    private void updateDebug() {
+        if(selectedEntity == null)
+            return;
+
+        Controller.setEntityid(String.valueOf(selectedEntity.getId()));
+        SoldierBehaviour soldierBehaviour = (SoldierBehaviour) selectedEntity.getComponent(SoldierBehaviour.class);
+        if(soldierBehaviour != null) {
+            Controller.setPrimaryweapon(soldierBehaviour.getWeaponPrimary().toString());
+            Controller.setMagazine(soldierBehaviour.getWeaponPrimary().getMagazine().toString());
+            Controller.setAmmunition(Ammunition.ammunitionMap.get(soldierBehaviour.getWeaponPrimary().getMagazine().getAmmunitionType()).toString());
+            Controller.setBloodPercentage(soldierBehaviour.getHealthSystem().getBloodPercentage());
+            Controller.setHealthSystem(soldierBehaviour.getHealthSystem().toString());
+            Controller.setPosition(soldierBehaviour.getTransformComponent().getPosition().toString());
+            Controller.setRotation(String.valueOf(soldierBehaviour.getTransformComponent().getRotation()));
+        } else {
+            Controller.setPrimaryweapon("No weapon");
+            Controller.setMagazine("No weapon");
+            Controller.setAmmunition("No weapon");
+            Controller.setBloodPercentage(0.0f);
+            Controller.setHealthSystem("No healthsystem");
+            Controller.setPosition("No transform component");
+            Controller.setRotation("No transform component");
+        }
     }
 
     private void updateCamera(float deltaTime){
         if(glfwGetMouseButton(windowId, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS){
-            System.out.println("Clicking");
+            if(selectedEntity != null && selectedEntity.hasComponent(SoldierBehaviour.class))
+                ((SoldierBehaviour)selectedEntity.getComponent(SoldierBehaviour.class)).getMovementSystem().setTarget(MousePosition.getMouseWorldPosition());
+        }
+
+        if(glfwGetKey(windowId, GLFW_KEY_SPACE) == GLFW_PRESS && !keyDown[GLFW_KEY_SPACE]){
+            keyDown[GLFW_KEY_SPACE] = true;
+            ((SoldierBehaviour)testEntity.getComponent(SoldierBehaviour.class)).shootTarget((SoldierBehaviour) testEntity2.getComponent(SoldierBehaviour.class));
+        } else if(glfwGetKey(windowId, GLFW_KEY_SPACE) != GLFW_PRESS){
+            keyDown[GLFW_KEY_SPACE] = false;
+        }
+
+        if(glfwGetKey(windowId, GLFW_KEY_Z) == GLFW_PRESS && !keyDown[GLFW_KEY_Z]){
+            keyDown[GLFW_KEY_Z] = true;
+            selectedEntityId = EntityManager.instance.getNextEntityId(selectedEntityId);
+            selectEntity(selectedEntityId);
+        } else if(glfwGetKey(windowId, GLFW_KEY_Z) != GLFW_PRESS){
+            keyDown[GLFW_KEY_Z] = false;
         }
 
         if(glfwGetKey(windowId, GLFW_KEY_A) == GLFW_PRESS){
@@ -135,10 +188,14 @@ public class GameManager extends Behaviour {
             camera.translate(0, -camera_speed * deltaTime);
         }
 
+        if(glfwGetKey(windowId, GLFW_KEY_R) == GLFW_PRESS){
+            ((SoldierBehaviour)testEntity.getComponent(SoldierBehaviour.class)).getMovementSystem().setTargetBearing(150);
+        }
+
         if(glfwGetKey(windowId, GLFW_KEY_Q) == GLFW_PRESS){
-            ((TransformComponent)testEntity.getComponent(TransformComponent.class)).rotate(-90f * deltaTime);
+            ((TransformComponent)testEntity.getComponent(TransformComponent.class)).rotate(-270f * deltaTime);
         } else if(glfwGetKey(windowId, GLFW_KEY_E) == GLFW_PRESS){
-            ((TransformComponent)testEntity.getComponent(TransformComponent.class)).rotate(90f * deltaTime);
+            ((TransformComponent)testEntity.getComponent(TransformComponent.class)).rotate(270f * deltaTime);
         }
     }
 }

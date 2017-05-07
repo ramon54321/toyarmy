@@ -10,33 +10,33 @@ import java.util.Map;
  */
 public class BodyArmour {
 
-    public static Map<String, BodyArmour> bodyArmourMap = new HashMap<>();
+    public static Map<String, BodyArmour> bodyArmourDataMap = new HashMap<>();
 
     static {
-        bodyArmourMap.put("LightweightCarrier", new BodyArmour("LightweightCarrier",1000));
+        bodyArmourDataMap.put("LightweightCarrier", new BodyArmour("LightweightCarrier", new BodyArmourMap(0,1000, 0,0,0,0)));
     }
 
     public static BodyArmour getNewBodyArmour(String type) {
-        BodyArmour template = bodyArmourMap.get(type);
+        BodyArmour template = bodyArmourDataMap.get(type);
         if(template == null)
             return null;
 
-        return new BodyArmour(template.type, template.armour);
+        return new BodyArmour(template.type, template.bodyArmourMap);
     }
 
     private String type;
-    private float armour;
+    private BodyArmourMap bodyArmourMap;
 
-    public BodyArmour(String type, float armour) {
+    public BodyArmour(String type, BodyArmourMap bodyArmourMap) {
         this.type = type;
-        this.armour = armour;
+        this.bodyArmourMap = bodyArmourMap;
     }
 
     public String getType() {
         return type;
     }
 
-    public float getArmour() {
-        return armour;
+    public BodyArmourMap getBodyArmourMap() {
+        return bodyArmourMap;
     }
 }

@@ -8,6 +8,7 @@ import org.toyarmy.engine.Component;
 import org.toyarmy.engine.Entity;
 import org.toyarmy.engine.math.LineSegment;
 import org.toyarmy.game.behaviours.CollisionBehaviour;
+import org.toyarmy.game.behaviours.SoldierBehaviour;
 import org.toyarmy.game.utility.CollisionSegment;
 import org.toyarmy.graphics.rendering.shaders.ShaderProgram;
 import org.toyarmy.graphics.rendering.utilities.BufferLoader;
@@ -30,7 +31,8 @@ import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 public class MultiLineRendererComponent extends Component {
 
     public static final int SOURCE_NONE = 0;
-    public static final int SOURCE_COLLISION = 0;
+    public static final int SOURCE_COLLISION = 1;
+    public static final int SOURCE_FIELDOFVIEW = 2;
 
     private static ShaderProgram shaderProgram = new ShaderProgram("shaders/line.vertex", "shaders/line.fragment");
     private TransformComponent transformComponent;
@@ -57,17 +59,40 @@ public class MultiLineRendererComponent extends Component {
                 lineSegments.add(collisionSegment.getCollisionLineSegment());
             }
 
-            setColor(1.0f, 0.0f, 0.0f);
+            setColor(0.6f, 0.2f, 0.2f, 1.0f);
+        } else if(source == SOURCE_FIELDOFVIEW) {
+            lineSegments.clear();
+            SoldierBehaviour soldierBehaviour = ((SoldierBehaviour)parentEntity.getComponent(SoldierBehaviour.class));
+
+            if(soldierBehaviour == null)
+                return;
+
+            float radius = soldierBehaviour.getOpticsSystem().getRange();
+            float theta = (float) ((soldierBehaviour.getOpticsSystem().getFieldOfView() / 2) / (180 / Math.PI));
+
+            float leftTipX = (float) Math.sin(theta) * -radius;
+            float rightTipX = (float) Math.sin(theta) * radius;
+            float tipY = (float) Math.cos(theta) * radius;
+
+            Vector2f rootPos = new Vector2f();
+            Vector2f leftTip = new Vector2f().add(leftTipX, tipY);
+            Vector2f rightTip = new Vector2f().add(rightTipX, tipY);
+
+            lineSegments.add(new LineSegment(rootPos, leftTip));
+            lineSegments.add(new LineSegment(rootPos, rightTip));
+
+            setColor(0.2f, 0.9f, 0.47f, 1.0f);
         }
     }
 
     private ArrayList<LineSegment> lineSegments = new ArrayList<>();
 
-    private float red = 0.0f, green = 1.0f, blue = 0.0f;
-    public void setColor(float red, float green, float blue) {
+    private float red = 0.0f, green = 1.0f, blue = 0.0f, alpha = 1.0f;
+    public void setColor(float red, float green, float blue, float alpha) {
         this.red = red;
         this.green = green;
         this.blue = blue;
+        this.alpha = alpha;
     }
 
     @Override
@@ -96,20 +121,22 @@ public class MultiLineRendererComponent extends Component {
         glBufferData(GL_ARRAY_BUFFER, positionsBuffer, GL_STATIC_DRAW);
         glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, 0);
 
-        float[] colors = new float[lineSegments.size() * 6];
+        float[] colors = new float[lineSegments.size() * 8];
         for(int i = 0; i < lineSegments.size(); i++) {
-            colors[i*6 + 0] = red;
-            colors[i*6 + 1] = green;
-            colors[i*6 + 2] = blue;
-            colors[i*6 + 3] = red;
-            colors[i*6 + 4] = green;
-            colors[i*6 + 5] = blue;
+            colors[i*8 + 0] = red;
+            colors[i*8 + 1] = green;
+            colors[i*8 + 2] = blue;
+            colors[i*8 + 3] = alpha;
+            colors[i*8 + 4] = red;
+            colors[i*8 + 5] = green;
+            colors[i*8 + 6] = blue;
+            colors[i*8 + 7] = alpha;
         }
         FloatBuffer colorsBuffer = BufferLoader.getFloatBuffer(colors);
 
         glBindBuffer(GL_ARRAY_BUFFER, colorsId);
         glBufferData(GL_ARRAY_BUFFER, colorsBuffer, GL_STATIC_DRAW);
-        glVertexAttribPointer(1, 3, GL_FLOAT, false, 0, 0);
+        glVertexAttribPointer(1, 4, GL_FLOAT, false, 0, 0);
 
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
