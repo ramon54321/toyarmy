@@ -1,0 +1,7 @@
+target
+.idea
+com.*
+java.*
+javafx.*
+org.*
+sun.*
