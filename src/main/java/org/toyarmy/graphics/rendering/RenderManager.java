@@ -1,5 +1,6 @@
 package org.toyarmy.graphics.rendering;
 
+import engine.profile.GPUProfiler;
 import org.toyarmy.engine.Entity;
 import org.toyarmy.engine.EntityManager;
 import org.toyarmy.graphics.Display;
@@ -32,13 +33,22 @@ public class RenderManager {
     }
 
     public void render(){
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        GPUProfiler.start("GL Clear");
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        GPUProfiler.end();
+
+        GPUProfiler.start("Render Entity Components");
         for (Entity entitiy : entityManager.getEntities()) {
             entitiy.renderComponents();
         }
+        GPUProfiler.end();
 
+        glFlush();
+
+        GPUProfiler.start("Swap Buffers");
         glfwSwapBuffers(display.getWindowId());
+        GPUProfiler.end();
     }
 
     public Camera getCamera(){

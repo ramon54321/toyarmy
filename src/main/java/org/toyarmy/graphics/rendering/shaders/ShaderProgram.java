@@ -63,4 +63,8 @@ public class ShaderProgram {
 	public void bind(){
 		glUseProgram(shaderProgramId);
 	}
+
+	public void unbind(){
+		glUseProgram(0);
+	}
 }

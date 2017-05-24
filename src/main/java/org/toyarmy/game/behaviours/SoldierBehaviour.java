@@ -45,7 +45,7 @@ public class SoldierBehaviour extends Behaviour {
         this.transformComponent = (TransformComponent) parentEntity.getComponent(TransformComponent.class);
 
         // Setup Soldier
-        opticsSystem = new OpticsSystem(5, 45);
+        opticsSystem = new OpticsSystem(parentEntity, 12, 140);
         movementSystem = new MovementSystem(transformComponent);
         healthSystem = new HealthSystem();
         Magazine mag = Magazine.getNewMagazine("Stanag30");
@@ -56,9 +56,13 @@ public class SoldierBehaviour extends Behaviour {
     @Override
     public void updateComponent(float deltaTime) {
         super.updateComponent(deltaTime);
+        opticsSystem.update(deltaTime);
         movementSystem.update(deltaTime);
         healthSystem.update(deltaTime);
     }
+
+    // OpticsSystem
+
 
     // HealthSystem
     public void takeHit(BallisticData ballisticData) {

@@ -14,6 +14,8 @@ public class Entity {
 
     protected List<Component> components = new ArrayList<>();
 
+    private TransformComponent transformComponent;
+
     public void renderComponents(){
         for (Component component : components) {
             component.renderComponent();
@@ -53,7 +55,8 @@ public class Entity {
 
     public Entity(int id, float depth) {
         this.id = id;
-        addComponent(new TransformComponent(this, depth));
+        this.transformComponent = new TransformComponent(this, depth);
+        addComponent(this.transformComponent);
     }
 
     public void delete() {
@@ -64,5 +67,18 @@ public class Entity {
 
     public int getId() {
         return id;
+    }
+
+    public TransformComponent getTransformComponent() {
+        return transformComponent;
+    }
+
+    public List<Component> getComponents() {
+        return components;
+    }
+
+    @Override
+    public String toString() {
+        return "Entity - " + id;
     }
 }

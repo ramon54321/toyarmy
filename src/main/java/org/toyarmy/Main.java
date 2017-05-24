@@ -1,5 +1,7 @@
 package org.toyarmy;
 
+import engine.profile.GPUProfiler;
+import engine.profile.GPUTaskProfile;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -17,6 +19,7 @@ import org.toyarmy.graphics.rendering.RenderManager;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11.glFlush;
 
 public class Main extends Application{
 
@@ -100,7 +103,7 @@ public class Main extends Application{
             frames++;
             if (System.currentTimeMillis() - timer > 1000) {
                 timer += 1000;
-                //System.out.println(updates + " ups, " + frames + " fps");
+                System.out.println(updates + " ups, " + frames + " fps");
                 Controller.setFps(updates + " ups, " + frames + " fps");
                 updates = 0;
                 frames = 0;
@@ -116,8 +119,26 @@ public class Main extends Application{
 
     private void render(){
 
+        //GPUProfiler.startFrame();
+
+        //GPUProfiler.start("Render");
+
         renderManager.render();
 
+        //GPUProfiler.end();
+
+        //GPUProfiler.endFrame();
+
+        /*
+        GPUTaskProfile tp;
+
+        tp = GPUProfiler.getFrameResults();
+        if(tp != null) {
+            tp.dump();
+        } else {
+            System.out.println("Null tp");
+        }
+        */
     }
 
     public static void main(String[] args) {
@@ -128,6 +149,7 @@ public class Main extends Application{
             }
         }.start();
         launch(args);
+        //new Main().run();
     }
 
 }

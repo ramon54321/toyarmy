@@ -23,6 +23,7 @@ public class Controller implements Initializable {
     @FXML private Text rotation;
     @FXML private Text position;
     @FXML private Text fps;
+    @FXML private Text entitiesInView;
 
     public static void setEntityid(String text) {
         if(controller != null) {
@@ -91,6 +92,14 @@ public class Controller implements Initializable {
     public static void setFps(String text) {
         if(controller != null) {
             Platform.runLater(() -> controller.fps.setText(text));
+        } else {
+            System.out.println("Controller null");
+        }
+    }
+
+    public static void setEntitiesInView(String text) {
+        if(controller != null) {
+            Platform.runLater(() -> controller.entitiesInView.setText(text));
         } else {
             System.out.println("Controller null");
         }

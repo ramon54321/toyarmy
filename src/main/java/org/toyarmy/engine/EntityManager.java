@@ -1,6 +1,9 @@
 package org.toyarmy.engine;
 
+import org.joml.Vector2f;
+import org.omg.IOP.ENCODING_CDR_ENCAPS;
 import org.toyarmy.engine.components.TransformComponent;
+import org.toyarmy.engine.math.VectorMath;
 
 import java.util.*;
 
@@ -53,6 +56,20 @@ public class EntityManager {
 
     public Set<Entity> getEntities(){
         return this.entities;
+    }
+
+    public Set<Entity> getEntitiesWithinSquaredRadius(Entity entity, float squaredRadius) {
+        Set<Entity> set = new HashSet<>();
+
+        Vector2f origin = entity.getTransformComponent().getPosition();
+        for(Entity entity2 : getEntities()) {
+            Vector2f entityPosition = entity2.getTransformComponent().getPosition();
+            float squaredDistance = VectorMath.distanceBetweenSquared(origin, entityPosition);
+            if(squaredDistance < squaredRadius)
+                set.add(entity2);
+        }
+
+        return set;
     }
 
     public int getNextEntityId(int currentId) {

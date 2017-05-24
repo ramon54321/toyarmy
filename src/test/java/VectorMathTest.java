@@ -24,7 +24,7 @@ public class VectorMathTest {
     @Test
     public void testBearing() {
         System.out.println("Bearing");
-        System.out.println(VectorMath.getBearingOf(new Vector2f(4,4)));
+        System.out.println(VectorMath.getBearingOf(new Vector2f(-4,4.1f)));
         System.out.println(VectorMath.getBearingOf(new Vector2f(4,-4)));
         System.out.println(VectorMath.getBearingOf(new Vector2f(-4,-4)));
         System.out.println(VectorMath.getBearingOf(new Vector2f(-4,4)));
@@ -46,8 +46,16 @@ public class VectorMathTest {
     @Test
     public void testBearingFrom() {
         System.out.println("Bearing From");
+        System.out.println(VectorMath.getBearingFrom(new Vector2f(0,0), new Vector2f(-4, 4.1f)));
         assertTrue(VectorMath.getBearingFrom(new Vector2f(0,0), new Vector2f(4, 4)) == 45f);
         assertTrue(VectorMath.getBearingFrom(new Vector2f(4,4), new Vector2f(8, 8)) == 45f);
         assertTrue(VectorMath.getBearingFrom(new Vector2f(4,4), new Vector2f(0, 0)) == 225f);
+        assertTrue(VectorMath.getBearingFrom(new Vector2f(0,0), new Vector2f(-4, 4)) == 315f);
+    }
+
+    @Test
+    public void testRotateVector() {
+        System.out.println("Rotate Vector");
+        System.out.println(VectorMath.getRotatedVector(new Vector2f(0,1), 90));
     }
 }

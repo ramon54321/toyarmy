@@ -55,5 +55,9 @@ public class SpriteRendererComponent extends Component {
         shaderProgram.setUniform("camera", cameraBuffer);
 
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+        quad.unbind();
+        shaderProgram.unbind();
+        texture.unbind();
     }
 }

@@ -51,4 +51,9 @@ public class Texture {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, id);
     }
+
+    public void unbind(){
+        glActiveTexture(0);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
 }

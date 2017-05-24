@@ -7,6 +7,7 @@ import org.toyarmy.Main;
 import org.toyarmy.engine.Component;
 import org.toyarmy.engine.Entity;
 import org.toyarmy.engine.math.LineSegment;
+import org.toyarmy.engine.math.VectorMath;
 import org.toyarmy.game.behaviours.CollisionBehaviour;
 import org.toyarmy.game.behaviours.SoldierBehaviour;
 import org.toyarmy.game.utility.CollisionSegment;
@@ -47,6 +48,7 @@ public class MultiLineRendererComponent extends Component {
         updateSource();
     }
 
+    // Only runs on start
     public void updateSource() {
         if(source == SOURCE_COLLISION) {
             lineSegments.clear();
@@ -68,7 +70,8 @@ public class MultiLineRendererComponent extends Component {
                 return;
 
             float radius = soldierBehaviour.getOpticsSystem().getRange();
-            float theta = (float) ((soldierBehaviour.getOpticsSystem().getFieldOfView() / 2) / (180 / Math.PI));
+            float fieldOfView = soldierBehaviour.getOpticsSystem().getFieldOfView();
+            float theta = (float) ((fieldOfView / 2) / (180 / Math.PI));
 
             float leftTipX = (float) Math.sin(theta) * -radius;
             float rightTipX = (float) Math.sin(theta) * radius;
@@ -81,7 +84,27 @@ public class MultiLineRendererComponent extends Component {
             lineSegments.add(new LineSegment(rootPos, leftTip));
             lineSegments.add(new LineSegment(rootPos, rightTip));
 
-            setColor(0.2f, 0.9f, 0.47f, 1.0f);
+            int divisions = 64;
+
+            // Draw arc
+            Vector2f[] arcPoints = new Vector2f[2 + (divisions-1)];
+            arcPoints[0] = leftTip;
+            arcPoints[arcPoints.length-1] = rightTip;
+
+            float divisionAngle = fieldOfView / divisions;
+
+            Vector2f position = transformComponent.getPosition();
+            Vector2f localArm = new Vector2f(leftTip).sub(position);
+            for(int i = 1; i < divisions; i++) {
+                Vector2f rotatedArm = VectorMath.getRotatedVector(localArm, divisionAngle * i);
+                arcPoints[i] = rotatedArm.add(position);
+            }
+
+            for(int i = 0; i < arcPoints.length-1; i++) {
+                lineSegments.add(new LineSegment(arcPoints[i], arcPoints[i+1]));
+            }
+
+            setColor(0.2f, 0.9f, 0.47f, 0.2f);
         }
     }
 

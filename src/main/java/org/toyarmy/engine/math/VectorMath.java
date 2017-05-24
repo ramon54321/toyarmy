@@ -1,6 +1,9 @@
 package org.toyarmy.engine.math;
 
+import org.joml.Matrix3f;
+import org.joml.Matrix4f;
 import org.joml.Vector2f;
+import org.joml.Vector3f;
 
 /**
  * Created by Ramon Brand on 4/20/2017.
@@ -45,10 +48,10 @@ public class VectorMath {
             return 90 - raw;
 
         if(raw > 90)
-            return 180 + raw;
+            return 360 - (raw - 90);
 
         if(raw < -90)
-            return 360 + raw;
+            return 180 + (-raw - 90);
 
         return -1;
     }
@@ -68,11 +71,21 @@ public class VectorMath {
     public static float getBearingDifference(float startBearing, float targetBearing) {
         float differenceRaw = targetBearing - startBearing;
 
+
         if(differenceRaw > 180) {// Left -> Neg
             return (360 - differenceRaw) * -1;
+        } else if(differenceRaw < -180) {
+            return 360 - (differenceRaw * -1);
         } else {//Right
             return differenceRaw;
         }
     }
 
+    public static Vector2f getRotatedVector(Vector2f vector, float angle) {
+        Vector3f rotatedVector = new Vector3f(vector.x, vector.y, 0);
+        Matrix3f transformMatrix = new Matrix3f();
+        transformMatrix.rotate(-angle / (180 / (float) Math.PI), 0, 0, 1);
+        transformMatrix.transform(rotatedVector);
+        return new Vector2f(rotatedVector.x, rotatedVector.y);
+    }
 }

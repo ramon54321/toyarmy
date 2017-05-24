@@ -18,11 +18,8 @@ public class MovementSystem {
 
     private float rotationBaseSpeed = 270;
 
-    private float maxSpeed = 2;
-    private float currentSpeed = 0;
-    private float acceleration = 1f;
-    private boolean braking = false;
-    private Vector2f brakingVector;
+    private float maxSpeed = 2.4f;
+    private float acceleration = 1.0f;
 
     public MovementSystem(TransformComponent transformComponent) {
         this.transformComponent = transformComponent;
@@ -31,12 +28,15 @@ public class MovementSystem {
 
     public void setTarget(Vector2f target) {
         this.target = target;
-        this.braking = false;
     }
 
     public void setTargetBearing(float targetBearing) {
         this.targetBearing = targetBearing;
     }
+
+
+
+    private Vector2f movementVector = new Vector2f();
 
     public void update(float deltaTime) {
 
@@ -45,49 +45,23 @@ public class MovementSystem {
 
         if(target != null) {
 
+            Vector2f toTargetVector = new Vector2f();
+            target.sub(transformComponent.getPosition(), toTargetVector);
 
-            Vector2f movementVector = new Vector2f();
-            target.sub(transformComponent.getPosition(), movementVector);
-
-            float distanceToTarget = movementVector.length();
-
-            movementVector.normalize();
-
-            // Clear Movement Target
-            //if(currentSpeed < 0.05f) {
-            //    target = null;
-            //    return;
-            //}
-
-            float breakingDistance = ((currentSpeed / acceleration) * (currentSpeed / acceleration)) * acceleration / 2;
-
-            // Brake from now on
-            if((distanceToTarget < breakingDistance || distanceToTarget < 0.1f) && !braking) {
-                braking = true;
-                brakingVector = new Vector2f(movementVector);
-                System.out.println(brakingVector);
+            if(toTargetVector.length() > 1) {
+                toTargetVector.normalize();
+                toTargetVector.mul(0.02f * acceleration);
+                movementVector.add(toTargetVector);
+            } else {
+                movementVector.x = toTargetVector.x;
+                movementVector.y = toTargetVector.y;
             }
 
-            // Breaking
-            if(braking) {
-                currentSpeed -= acceleration * deltaTime;
-                if(currentSpeed < 0)
-                    currentSpeed = 0;
-                transformComponent.translate(new Vector2f(brakingVector).mul(deltaTime * currentSpeed));
-                return;
-            }
-
-            // Accelerating
-            if(currentSpeed < maxSpeed) {
-                currentSpeed += acceleration * deltaTime;
-                if(currentSpeed > maxSpeed)
-                    currentSpeed = maxSpeed;
-                transformComponent.translate(movementVector.mul(deltaTime * currentSpeed));
-                return;
-            }
+            if(movementVector.length() > 1)
+                movementVector.normalize();
 
             // Normal Movement
-            transformComponent.translate(movementVector.mul(deltaTime * currentSpeed));
+            transformComponent.translate(new Vector2f(movementVector).mul(deltaTime * maxSpeed));
         }
     }
 

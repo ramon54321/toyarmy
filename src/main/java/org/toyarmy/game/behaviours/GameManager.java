@@ -14,6 +14,7 @@ import org.toyarmy.engine.components.MultiLineRendererComponent;
 import org.toyarmy.engine.components.SpriteRendererComponent;
 import org.toyarmy.engine.components.TransformComponent;
 import org.toyarmy.engine.math.LineSegment;
+import org.toyarmy.engine.math.VectorMath;
 import org.toyarmy.game.ammunition.Ammunition;
 import org.toyarmy.game.utility.CollisionMaterial;
 import org.toyarmy.game.utility.CollisionSegment;
@@ -97,8 +98,9 @@ public class GameManager extends Behaviour {
 
         testEntity2 = EntityManager.getInstance().createNewEntity(-1);
         testEntity2.addComponent(new SpriteRendererComponent(testEntity2, new Texture("unit.png")));
-        //testEntity2.addComponent(new MouseFollowerBehaviour(testEntity2));
         testEntity2.addComponent(new SoldierBehaviour(testEntity2));
+        testEntity2.addComponent(new MultiLineRendererComponent(testEntity2, MultiLineRendererComponent.SOURCE_FIELDOFVIEW));
+
         ((TransformComponent)testEntity2.getComponent(TransformComponent.class)).translate(new Vector2f(2, 7));
 
         // Collider
@@ -145,6 +147,7 @@ public class GameManager extends Behaviour {
             Controller.setHealthSystem(soldierBehaviour.getHealthSystem().toString());
             Controller.setPosition(soldierBehaviour.getTransformComponent().getPosition().toString());
             Controller.setRotation(String.valueOf(soldierBehaviour.getTransformComponent().getRotation()));
+            Controller.setEntitiesInView(soldierBehaviour.getOpticsSystem().getEntitiesInFov().toString());
         } else {
             Controller.setPrimaryweapon("No weapon");
             Controller.setMagazine("No weapon");
@@ -153,13 +156,21 @@ public class GameManager extends Behaviour {
             Controller.setHealthSystem("No healthsystem");
             Controller.setPosition("No transform component");
             Controller.setRotation("No transform component");
+            Controller.setEntitiesInView("No optics system");
         }
     }
 
     private void updateCamera(float deltaTime){
         if(glfwGetMouseButton(windowId, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS){
-            if(selectedEntity != null && selectedEntity.hasComponent(SoldierBehaviour.class))
-                ((SoldierBehaviour)selectedEntity.getComponent(SoldierBehaviour.class)).getMovementSystem().setTarget(MousePosition.getMouseWorldPosition());
+            if(selectedEntity != null && selectedEntity.hasComponent(SoldierBehaviour.class)) {
+                ((SoldierBehaviour) selectedEntity.getComponent(SoldierBehaviour.class)).getMovementSystem().setTarget(MousePosition.getMouseWorldPosition());
+
+                Vector2f pos = ((SoldierBehaviour) selectedEntity.getComponent(SoldierBehaviour.class)).getTransformComponent().getPosition();
+                Vector2f mouse = MousePosition.getMouseWorldPosition();
+
+                float bearing = VectorMath.getBearingFrom(pos, mouse);
+                ((SoldierBehaviour) selectedEntity.getComponent(SoldierBehaviour.class)).getMovementSystem().setTargetBearing(bearing);
+            }
         }
 
         if(glfwGetKey(windowId, GLFW_KEY_SPACE) == GLFW_PRESS && !keyDown[GLFW_KEY_SPACE]){

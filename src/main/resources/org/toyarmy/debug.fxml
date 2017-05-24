@@ -34,5 +34,7 @@
       <Text layoutX="15.0" layoutY="233.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Position" />
       <Text fx:id="position" layoutX="150.0" layoutY="233.0" strokeType="OUTSIDE" strokeWidth="0.0" text="position" />
       <Text fx:id="fps" layoutX="14.0" layoutY="38.0" strokeType="OUTSIDE" strokeWidth="0.0" text="fps" />
+      <Text layoutX="880.0" layoutY="149.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Entities In View" />
+      <Text fx:id="entitiesInView" layoutX="880.0" layoutY="165.0" strokeType="OUTSIDE" strokeWidth="0.0" text="entitiesInView" />
    </children>
 </AnchorPane>
